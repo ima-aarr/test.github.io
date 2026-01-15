@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>DIGITAL JUNKYARD</title>
+    <title>ULTIMATE_DEEP_LINK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -14,117 +14,130 @@
     }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Space Mono', monospace; touch-action: none; cursor: crosshair; }
-        .ui-header { position: fixed; top: 0; left: 0; right: 0; padding: 1.5rem; display: flex; justify-content: space-between; color: limegreen; font-size: 0.6rem; letter-spacing: 0.15em; border-bottom: 1px solid rgba(0,255,0,0.2); }
-        .ui-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 1.5rem; display: flex; justify-content: space-between; color: cyan; font-size: 0.6rem; letter-spacing: 0.15em; border-top: 1px solid rgba(0,255,255,0.2); }
-        #info-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 1.5rem; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,255,255,0.5); border-radius: 4px; color: cyan; font-size: 0.8rem; letter-spacing: 0.05em; line-height: 1.5; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 200; }
-        #info-panel.active { opacity: 1; pointer-events: auto; }
-        .title-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Syncopate', sans-serif; font-size: 3rem; md:font-size: 6rem; font-weight: bold; color: white; mix-blend-mode: difference; z-index: 100; pointer-events: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Mono&display=swap');
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Space Mono', monospace; touch-action: none; }
+        .ui-layer { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+        .interactive { pointer-events: auto; }
+        .glitch-title { font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 10vw, 8rem); line-height: 0.9; text-transform: uppercase; color: white; mix-blend-mode: difference; }
+        #data-box { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        .vignette { position: fixed; inset: 0; background: radial-gradient(circle, transparent 20%, black 150%); pointer-events: none; z-index: 10; }
     </style>
 </head>
-<body>
-    <div class="ui-header">
-        <span>STATUS: OMNI-RLM ONLINE</span>
-        <span>ENERGY: 99.8%</span>
+<body class="text-white">
+    <div class="vignette"></div>
+    <div class="ui-layer flex flex-col justify-between p-6 md:p-12">
+        <div class="flex justify-between items-start opacity-40 text-[7px] md:text-[9px] tracking-[1em]">
+            <div>SYS_LOG: <span id="log-status">ACTIVE</span></div>
+            <div>COORDS: <span id="coords">0.0, 0.0</span></div>
+        </div>
+
+        <div class="text-center relative">
+            <h1 class="glitch-title mb-4 select-none">YOUR<br>NAME</h1>
+            <div class="text-[8px] md:text-[10px] tracking-[1.5em] opacity-30">DIMENSIONAL_INTERFACE</div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+            <div id="data-box" class="p-6 max-w-xs opacity-0 transform translate-y-10">
+                <div id="box-title" class="text-cyan-400 text-[10px] font-bold mb-2 tracking-widest">---</div>
+                <div id="box-content" class="text-[9px] text-white/60 leading-relaxed">---</div>
+            </div>
+            
+            <div class="flex flex-wrap gap-3 interactive">
+                <button id="warp-btn" class="px-6 py-3 border border-white/20 text-[9px] tracking-[0.4em] hover:bg-white hover:text-black transition-all">WARP</button>
+                <button id="color-btn" class="px-6 py-3 border border-white/20 text-[9px] tracking-[0.4em] hover:bg-white hover:text-black transition-all">SPECTRUM</button>
+            </div>
+        </div>
     </div>
 
-    <div class="title-text">DIGITAL JUNKYARD</div>
-
-    <div id="info-panel">
-        <h3 id="panel-title" class="text-lg font-bold mb-2"></h3>
-        <p id="panel-description"></p>
-        <p id="panel-status" class="text-xs mt-2 opacity-70"></p>
-    </div>
-
-    <div class="ui-footer">
-        <span>OBJECTS: + COUNTLESS</span>
-        <span>SYNC_RATE: <span class="text-pink-500">▲▲▲</span> 99.8%</span>
-    </div>
-
-    <canvas id="canvas" class="fixed inset-0"></canvas>
+    <canvas id="canvas" class="fixed inset-0 z-0"></canvas>
 
     <script type="module">
         import * as THREE from 'three';
 
-        const canvas = document.getElementById('canvas');
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        const light = new THREE.PointLight(0xffffff, 1000);
-        light.position.set(0, 0, 50);
-        scene.add(light, new THREE.AmbientLight(0x333333));
+        const galaxyCount = 15000;
+        const galaxyGeo = new THREE.BufferGeometry();
+        const galaxyPos = new Float32Array(galaxyCount * 3);
+        const galaxyColor = new Float32Array(galaxyCount * 3);
+        for(let i=0; i<galaxyCount*3; i++) {
+            galaxyPos[i] = (Math.random() - 0.5) * 200;
+            galaxyColor[i] = Math.random();
+        }
+        galaxyGeo.setAttribute('position', new THREE.BufferAttribute(galaxyPos, 3));
+        galaxyGeo.setAttribute('color', new THREE.BufferAttribute(galaxyColor, 3));
+        const stars = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({ size: 0.1, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }));
+        scene.add(stars);
 
-        const objects = [];
-        const objectData = [
-            { geo: new THREE.BoxGeometry(3, 3, 3), mat: new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }), data: { title: "CORE_MODULE", desc: "Primary computation unit. Online." } },
-            { geo: new THREE.SphereGeometry(2.5, 32, 32), mat: new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }), data: { title: "DATA_ORB", desc: "Encrypted memory cluster. Stable." } },
-            { geo: new THREE.CylinderGeometry(2, 2, 5, 32), mat: new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true }), data: { title: "STRUCT_BEAM", desc: "Structural integrity component. Optimal." } },
-            { geo: new THREE.TorusKnotGeometry(2, 0.5, 100, 16), mat: new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }), data: { title: "NEURAL_LINK", desc: "Inter-system data conduit. Active." } },
-            { geo: new THREE.OctahedronGeometry(2.8, 0), mat: new THREE.MeshBasicMaterial({ color: 0xffa500, wireframe: true }), data: { title: "MEMORY_CLUSTER", desc: "Fragmented historical records. Accessed." } }
+        const floaters = [];
+        const geometries = [new THREE.IcosahedronGeometry(2, 0), new THREE.TorusGeometry(3, 0.1, 16, 100), new THREE.OctahedronGeometry(2, 0)];
+        const labels = [
+            { t: "QUANTUM_NODE", c: "High-speed data processing fragment floating in the digital void." },
+            { t: "CORE_ARCHIVE", c: "Encrypted memory structures containing historical project logs." },
+            { t: "NEURAL_LINK", c: "Interactive synapse connecting user intent to system response." }
         ];
 
-        for (let i = 0; i < 20; i++) {
-            const dataIndex = Math.floor(Math.random() * objectData.length);
-            const item = objectData[dataIndex];
-            const mesh = new THREE.Mesh(item.geo, item.mat.clone());
-            
-            mesh.position.set(
-                (Math.random() - 0.5) * 60,
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 60
-            );
-            mesh.rotation.set(
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-                Math.random() * Math.PI
-            );
-            mesh.userData = { ...item.data, id: i, rotationSpeed: Math.random() * 0.02 + 0.005 };
+        for(let i=0; i<12; i++) {
+            const mesh = new THREE.Mesh(geometries[i % 3], new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.2 }));
+            mesh.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*40, (Math.random()-0.5)*40);
+            mesh.userData = labels[i % 3];
             scene.add(mesh);
-            objects.push(mesh);
+            floaters.push(mesh);
         }
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        const infoPanel = document.getElementById('info-panel');
+        camera.position.z = 60;
 
-        function onPointerClick(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        let mouse = new THREE.Vector2(), target = new THREE.Vector2();
+        let raycaster = new THREE.Raycaster();
+        let warpSpeed = 0.001;
 
+        const onMove = (x, y) => {
+            mouse.x = (x / window.innerWidth) * 2 - 1;
+            mouse.y = -(y / window.innerHeight) * 2 + 1;
+            document.getElementById('coords').innerText = `${mouse.x.toFixed(2)}, ${mouse.y.toFixed(2)}`;
+        };
+
+        window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+        window.addEventListener('touchmove', e => onMove(e.touches[0].clientX, e.touches[0].clientY));
+
+        window.addEventListener('mousedown', () => {
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(objects);
-
-            if (intersects.length > 0) {
-                const clickedObject = intersects[0].object;
-                document.getElementById('panel-title').innerText = clickedObject.userData.title;
-                document.getElementById('panel-description').innerText = clickedObject.userData.desc;
-                document.getElementById('panel-status').innerText = `ID: ${clickedObject.userData.id} | Status: Active`;
-                infoPanel.classList.add('active');
+            const hits = raycaster.intersectObjects(floaters);
+            const box = document.getElementById('data-box');
+            if(hits.length > 0) {
+                document.getElementById('box-title').innerText = hits[0].object.userData.t;
+                document.getElementById('box-content').innerText = hits[0].object.userData.c;
+                box.style.opacity = "1";
+                box.style.transform = "translateY(0)";
             } else {
-                infoPanel.classList.remove('active');
+                box.style.opacity = "0";
+                box.style.transform = "translateY(10px)";
             }
-        }
-        window.addEventListener('click', onPointerClick);
-        window.addEventListener('touchend', onPointerClick);
+        });
 
-        camera.position.z = 50;
+        document.getElementById('warp-btn').addEventListener('click', () => warpSpeed = warpSpeed < 0.05 ? 0.05 : 0.001);
+        document.getElementById('color-btn').addEventListener('click', () => {
+            stars.material.color.setHex(Math.random() * 0xffffff);
+            floaters.forEach(f => f.material.color.setHex(Math.random() * 0xffffff));
+        });
 
         function animate() {
             requestAnimationFrame(animate);
-
-            objects.forEach(obj => {
-                obj.rotation.x += obj.userData.rotationSpeed * 0.5;
-                obj.rotation.y += obj.userData.rotationSpeed;
+            stars.rotation.y += warpSpeed;
+            floaters.forEach((f, i) => {
+                f.rotation.x += 0.01;
+                f.rotation.y += 0.01;
+                f.position.y += Math.sin(Date.now() * 0.001 + i) * 0.02;
             });
-
-            camera.position.x += ((mouse.x * 20) - camera.position.x) * 0.05;
-            camera.position.y += ((-mouse.y * 20) - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
-
+            target.x += (mouse.x - target.x) * 0.05;
+            target.y += (mouse.y - target.y) * 0.05;
+            camera.position.x += (target.x * 20 - camera.position.x) * 0.05;
+            camera.position.y += (-target.y * 20 - camera.position.y) * 0.05;
+            camera.lookAt(0,0,0);
             renderer.render(scene, camera);
         }
         animate();
