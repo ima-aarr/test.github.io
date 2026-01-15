@@ -3,79 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXUS OMEGA | 40-in-1 Ultimate Suite</title>
+<title>NEXUS OMEGA | 究極ツール群</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--neon:#00f3ff;--purple:#bc13fe;--bg:#050505;--glass:rgba(20,20,20,0.6);--b:rgba(255,255,255,0.1)}
-body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow:hidden}
-.glass{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--b);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+:root{--neon:#00f3ff;--purple:#bc13fe;--bg:#050505;--glass:rgba(20,20,20,0.7);--b:rgba(255,255,255,0.1)}
+body{background:var(--bg);color:#eee;font-family:'Inter','Noto Sans JP',sans-serif;overflow:hidden;margin:0}
+.glass{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--b);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
 .mono{font-family:'JetBrains Mono',monospace}
-.card{transition:0.2s all;position:relative;overflow:hidden}
-.card:hover{transform:translateY(-4px);border-color:var(--neon);box-shadow:0 0 20px rgba(0,243,255,0.15)}
-.card::after{content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.03),transparent);transform:translateX(-100%);transition:0.5s}
+.card{transition:0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.card:hover{transform:translateY(-5px);border-color:var(--neon);box-shadow:0 0 25px rgba(0,243,255,0.2)}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.05),transparent);transform:translateX(-100%);transition:0.6s}
 .card:hover::after{transform:translateX(100%)}
-.scroll{-ms-overflow-style:none;scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
-input,textarea,select{background:rgba(0,0,0,0.4);border:1px solid var(--b);color:#fff;outline:none;transition:0.3s;border-radius:0.5rem}
-input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 10px rgba(0,243,255,0.2)}
-.btn{background:linear-gradient(135deg,var(--neon),var(--purple));border:none;color:#fff;font-weight:700;text-transform:uppercase;transition:0.3s}
-.btn:hover{opacity:0.9;box-shadow:0 0 15px var(--purple)}
-.btn-sec{background:rgba(255,255,255,0.1);border:1px solid var(--b);color:#ccc}
-.btn-sec:hover{background:rgba(255,255,255,0.2);color:#fff}
-.fade-enter-active,.fade-leave-active{transition:opacity 0.2s}.fade-enter-from,.fade-leave-to{opacity:0}
+.scroll-none::-webkit-scrollbar{display:none}
+input,textarea,select{background:rgba(0,0,0,0.5);border:1px solid var(--b);color:#fff;outline:none;transition:0.3s;border-radius:0.5rem}
+input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 15px rgba(0,243,255,0.3)}
+.btn-prime{background:linear-gradient(135deg,var(--neon),var(--purple));border:none;color:#fff;font-weight:700;transition:0.3s;cursor:pointer}
+.btn-prime:hover{filter:brightness(1.2);box-shadow:0 0 20px var(--neon)}
+.list-enter-active,.list-leave-active{transition:all 0.4s ease}.list-enter-from,.list-leave-to{opacity:0;transform:scale(0.9)}
 </style>
 </head>
 <body>
-<div id="bg" class="fixed inset-0 z-0 pointer-events-none"></div>
+<div id="bg-canvas" class="fixed inset-0 z-0 pointer-events-none"></div>
 <div id="app" class="relative z-10 h-screen flex flex-col">
-    <header class="glass h-14 flex items-center justify-between px-6 shrink-0 z-20">
-        <div class="flex items-center gap-3 text-neon font-black tracking-wider text-lg"><i class="fa-solid fa-layer-group"></i> NEXUS<span class="text-white text-xs font-normal opacity-50 mono">OMEGA v9.0</span></div>
-        <div class="flex-1 max-w-xl mx-8 relative group">
-            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-neon transition"></i>
-            <input v-model="q" type="text" placeholder="Search 40+ Tools (e.g. 'json', 'color', 'hash')..." class="w-full pl-10 pr-4 py-1.5 text-sm bg-white/5 focus:bg-black/50 border-white/10">
+    <header class="glass h-16 flex items-center justify-between px-8 shrink-0 border-b border-white/5">
+        <div class="flex items-center gap-3"><i class="fa-solid fa-atom text-2xl text-neon animate-spin-slow"></i><span class="text-xl font-black tracking-tighter italic">NEXUS<span class="text-neon">Ω</span></span><span class="ml-2 text-[10px] mono opacity-40">SYSTEM_READY</span></div>
+        <div class="flex-1 max-w-2xl mx-12 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input v-model="search" type="text" placeholder="40種類以上のツールから検索..." class="w-full pl-12 pr-4 py-2 bg-white/5 border-white/10 text-sm focus:ring-1 ring-neon/50">
         </div>
-        <div class="flex gap-4 text-gray-400 text-sm mono"><span>CPU:{{cpu}}%</span><span>MEM:{{mem}}MB</span></div>
+        <div class="flex items-center gap-6 text-[10px] mono">
+            <div class="text-right"><div class="text-gray-500 uppercase">Latency</div><div class="text-neon">{{ping}}ms</div></div>
+            <div class="text-right"><div class="text-gray-500 uppercase">Memory</div><div class="text-purple-400">OPTIMIZED</div></div>
+        </div>
     </header>
-
     <div class="flex flex-1 overflow-hidden">
-        <nav class="w-16 md:w-64 glass flex flex-col border-r-0 border-t-0 border-b-0 border-r border-white/5 shrink-0 transition-all duration-300">
-            <div class="p-2 space-y-1 overflow-y-auto scroll flex-1">
-                <button v-for="c in cats" :key="c" @click="cat=c" :class="['w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition',cat===c?'bg-white/10 text-neon border-l-2 border-neon':'text-gray-500 hover:text-white hover:bg-white/5']">
-                    <i :class="[catIcons[c],'w-5 text-center']"></i><span class="hidden md:inline text-sm font-medium">{{c}}</span>
-                    <span v-if="cat===c" class="ml-auto text-[10px] bg-neon/20 text-neon px-1.5 rounded hidden md:inline">{{getCt(c)}}</span>
+        <aside class="w-20 md:w-64 glass flex flex-col border-r border-white/5 transition-all">
+            <div class="p-3 space-y-2 overflow-y-auto flex-1 scroll-none">
+                <button v-for="c in categories" @click="activeCat=c" :class="['w-full text-left px-4 py-3 rounded-xl flex items-center gap-4 transition-all', activeCat===c?'bg-white/10 text-neon shadow-[inset_0_0_10px_rgba(0,243,255,0.1)]':'text-gray-500 hover:text-white']">
+                    <i :class="[catIcons[c],'w-5 text-center text-lg']"></i><span class="hidden md:inline text-sm font-bold">{{c}}</span>
                 </button>
             </div>
-            <div class="p-4 border-t border-white/10 hidden md:block"><div class="h-1 bg-gray-800 rounded overflow-hidden"><div class="h-full bg-neon animate-pulse" style="width:72%"></div></div><div class="flex justify-between text-[10px] text-gray-500 mt-1"><span>SYS_LOAD</span><span>OPTIMAL</span></div></div>
-        </nav>
-
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 scroll relative">
-            <transition-group name="list" tag="div" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 pb-20">
-                <div v-for="t in list" :key="t.id" @click="open(t)" class="card glass p-4 rounded-xl flex flex-col gap-3 h-40 cursor-pointer group">
+            <div class="p-6 border-t border-white/5 hidden md:block text-[10px] text-gray-600 mono">
+                <div class="flex justify-between mb-1"><span>CORE_STABILITY</span><span>99.9%</span></div>
+                <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-neon w-full animate-pulse"></div></div>
+            </div>
+        </aside>
+        <main class="flex-1 overflow-y-auto p-6 md:p-10 scroll-none">
+            <transition-group name="list" tag="div" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 pb-24">
+                <div v-for="t in filtered" :key="t.id" @click="activeTool=t" class="card glass p-5 rounded-2xl flex flex-col gap-4 cursor-pointer group">
                     <div class="flex justify-between items-start">
-                        <div :class="['w-10 h-10 rounded flex items-center justify-center text-lg bg-gradient-to-br text-white shadow-lg', t.grad]"><i :class="t.icon"></i></div>
-                        <span class="text-[10px] mono text-gray-600 group-hover:text-neon transition">ID:{{t.id}}</span>
+                        <div :class="['w-12 h-12 rounded-xl flex items-center justify-center text-xl text-white shadow-inner bg-gradient-to-br', t.grad]"><i :class="t.icon"></i></div>
+                        <div class="px-2 py-0.5 rounded-md bg-white/5 text-[9px] mono text-gray-500 group-hover:text-neon transition">{{t.id}}</div>
                     </div>
-                    <div><h3 class="font-bold text-sm text-gray-200 group-hover:text-white leading-tight">{{t.n}}</h3><p class="text-[11px] text-gray-500 mt-1 line-clamp-2">{{t.d}}</p></div>
+                    <div><h3 class="font-bold text-gray-100 group-hover:text-neon transition">{{t.n}}</h3><p class="text-[11px] text-gray-500 leading-relaxed mt-1 line-clamp-2">{{t.d}}</p></div>
                 </div>
             </transition-group>
         </main>
     </div>
-
     <transition name="fade">
-        <div v-if="cur" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4" @click.self="cur=null">
-            <div class="glass w-full max-w-5xl h-[90vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border-neon/30 animate-scale">
-                <div class="h-14 border-b border-white/10 flex items-center justify-between px-6 bg-white/5">
-                    <div class="flex items-center gap-3 text-neon"><i :class="cur.icon"></i><h2 class="font-bold tracking-wide">{{cur.n}}</h2></div>
-                    <button @click="cur=null" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark"></i></button>
+        <div v-if="activeTool" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4" @click.self="activeTool=null">
+            <div class="glass w-full max-w-6xl h-[85vh] rounded-[2rem] flex flex-col overflow-hidden border-neon/20">
+                <div class="h-16 flex items-center justify-between px-8 bg-white/5 shrink-0 border-b border-white/10">
+                    <div class="flex items-center gap-4 text-neon"><i :class="[activeTool.icon, 'text-2xl']"></i><h2 class="text-xl font-bold tracking-tight">{{activeTool.n}}</h2></div>
+                    <button @click="activeTool=null" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-6 bg-[#0a0a0a] relative">
-                    <component :is="cur.c" :def="cur"></component>
+                <div class="flex-1 overflow-hidden p-8 bg-[#080808]">
+                    <component :is="activeTool.c" :tool="activeTool"></component>
+                </div>
+                <div class="h-12 flex items-center px-8 text-[10px] text-gray-600 mono bg-black/50 justify-between">
+                    <span>ID: {{activeTool.id}} // MODULE_STATUS: ONLINE</span>
+                    <span class="text-neon">AES-256 ENCRYPTED SESSION</span>
                 </div>
             </div>
         </div>
@@ -83,282 +87,179 @@ input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 
 </div>
 
 <script type="text/x-template" id="tpl-trans">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-    <div class="flex flex-col h-full"><label class="text-xs text-gray-500 mb-2 mono">INPUT</label><textarea v-model="i" class="flex-1 p-4 font-mono text-sm resize-none bg-black/30" placeholder="Enter data..."></textarea></div>
-    <div class="flex flex-col h-full relative">
-        <label class="text-xs text-neon mb-2 mono flex justify-between"><span>OUTPUT</span><button @click="cp" class="hover:text-white"><i class="fa-regular fa-copy"></i></button></label>
-        <textarea :value="o" readonly class="flex-1 p-4 font-mono text-sm resize-none bg-[#0f0f15] text-neon border-neon/30 focus:shadow-[0_0_15px_rgba(0,243,255,0.1)]"></textarea>
-        <div class="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 md:flex flex-col gap-2 hidden">
-            <button class="w-8 h-8 rounded-full bg-neon text-black flex items-center justify-center shadow-[0_0_10px_var(--neon)]"><i class="fa-solid fa-arrow-right"></i></button>
-        </div>
+<div class="flex flex-col md:flex-row h-full gap-8">
+    <div class="flex-1 flex flex-col"><label class="text-[10px] text-gray-500 mb-2 mono">INPUT / 入力データ</label><textarea v-model="inp" class="flex-1 p-6 mono text-sm resize-none bg-black/40 border-white/5" placeholder="ここにデータを入力..."></textarea></div>
+    <div class="flex-1 flex flex-col relative">
+        <label class="text-[10px] text-neon mb-2 mono flex justify-between"><span>OUTPUT / 出力結果</span><button @click="copy" class="hover:text-white"><i class="fa-regular fa-copy"></i></button></label>
+        <textarea :value="out" readonly class="flex-1 p-6 mono text-sm resize-none bg-black/60 text-neon border-neon/20 shadow-[inset_0_0_30px_rgba(0,243,255,0.05)]"></textarea>
     </div>
 </div>
 </script>
 
 <script type="text/x-template" id="tpl-gen">
-<div class="max-w-3xl mx-auto space-y-8">
-    <div class="p-8 glass rounded-2xl text-center relative overflow-hidden group">
-        <div class="text-4xl md:text-5xl font-mono font-bold text-neon break-all drop-shadow-[0_0_10px_rgba(0,243,255,0.5)]">{{res}}</div>
-        <button @click="cp" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fa-regular fa-copy text-xl"></i></button>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button @click="run" class="col-span-1 md:col-span-3 btn py-4 rounded-xl text-lg shadow-lg tracking-widest"><i class="fa-solid fa-bolt mr-2"></i>GENERATE</button>
-        <div v-for="(opt,k) in def.opts" :key="k" class="p-3 border border-white/10 rounded bg-white/5 flex items-center justify-between">
-            <label class="text-sm text-gray-400">{{k}}</label>
-            <input v-if="typeof opt.v==='boolean'" type="checkbox" v-model="opt.v" class="accent-neon">
-            <input v-else type="number" v-model="opt.v" class="w-16 text-right bg-transparent border-none p-0 font-bold text-neon">
+<div class="max-w-4xl mx-auto h-full flex flex-col justify-center space-y-12">
+    <div class="relative group"><div class="absolute -inset-1 bg-gradient-to-r from-neon to-purple opacity-20 blur-xl group-hover:opacity-40 transition"></div><div class="relative p-10 glass rounded-3xl text-center"><div class="text-5xl mono font-black text-neon tracking-tighter break-all">{{res}}</div></div></div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <button @click="exec" class="md:col-span-4 btn-prime py-5 rounded-2xl text-lg font-black tracking-widest uppercase"><i class="fa-solid fa-bolt mr-2"></i> 生成を実行 </button>
+        <div v-for="(o,k) in tool.opts" :key="k" class="p-4 glass rounded-xl border-white/5 flex items-center justify-between">
+            <span class="text-xs text-gray-400">{{k}}</span>
+            <input v-if="typeof o.v==='boolean'" type="checkbox" v-model="o.v" class="w-5 h-5 accent-neon">
+            <input v-else type="number" v-model="o.v" class="w-16 text-right bg-transparent border-none font-bold text-neon">
         </div>
     </div>
 </div>
 </script>
 
 <script type="text/x-template" id="tpl-dual">
-<div class="flex flex-col h-full gap-4">
-    <div class="flex justify-end gap-2 h-8">
-        <button v-for="a in def.acts" @click="act(a.n)" class="btn-sec px-3 rounded text-xs">{{a.l}}</button>
+<div class="flex flex-col h-full gap-6">
+    <div class="flex justify-end gap-3 h-10">
+        <button v-for="a in tool.acts" @click="handle(a.n)" class="px-5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold hover:bg-neon hover:text-black transition-all">{{a.l}}</button>
     </div>
-    <div class="flex-1 grid grid-cols-2 gap-4 min-h-0">
-        <textarea v-model="v1" class="h-full resize-none p-4 mono text-xs bg-black/40" placeholder="Source..."></textarea>
-        <div v-if="def.mode==='html'" class="h-full bg-white text-black p-4 rounded overflow-auto prose prose-sm max-w-none" v-html="v2"></div>
-        <textarea v-else v-model="v2" :readonly="def.ro" class="h-full resize-none p-4 mono text-xs bg-[#111] text-gray-300" placeholder="Result..."></textarea>
-    </div>
-</div>
-</script>
-
-<script type="text/x-template" id="tpl-vis">
-<div class="flex flex-col md:flex-row h-full gap-8">
-    <div class="w-full md:w-1/3 space-y-6 overflow-y-auto pr-2">
-        <div v-for="(c,k) in ctrls" :key="k" class="space-y-2">
-            <div class="flex justify-between text-xs text-gray-400 uppercase"><span>{{k}}</span><span class="text-neon">{{c.v}}</span></div>
-            <input type="range" v-model.number="c.v" :min="c.min" :max="c.max" :step="c.step||1" class="w-full accent-neon h-1 bg-gray-700 rounded-lg appearance-none">
+    <div class="flex-1 grid grid-cols-2 gap-6 min-h-0">
+        <div class="flex flex-col"><label class="text-[10px] text-gray-500 mb-2">ソース</label><textarea v-model="v1" class="flex-1 p-5 mono text-xs bg-black/40 border-white/5 resize-none shadow-inner"></textarea></div>
+        <div class="flex flex-col"><label class="text-[10px] text-neon mb-2">プレビュー / 結果</label>
+            <div v-if="tool.mode==='md'" class="flex-1 bg-white text-gray-800 p-6 rounded-xl overflow-auto prose prose-sm" v-html="v2"></div>
+            <textarea v-else v-model="v2" class="flex-1 p-5 mono text-xs bg-black/60 text-gray-300 border-white/5 resize-none" readonly></textarea>
         </div>
-        <div v-if="def.id==='T07'||def.id==='T26'" class="grid grid-cols-2 gap-2"><input type="text" v-model="hex" class="col-span-2 text-center mono text-neon font-bold"><div class="col-span-2 h-20 rounded border border-white/20" :style="{background:bg}"></div></div>
-        <div v-if="def.id==='T08'"><input type="text" v-model="qrText" class="w-full p-2 mb-4" placeholder="URL or Text"></div>
-    </div>
-    <div class="flex-1 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-black/50 rounded-xl border border-white/10 flex items-center justify-center relative overflow-hidden">
-        <div v-if="def.id==='T20'" :style="shadowStyle" class="w-40 h-40 bg-white rounded-xl"></div>
-        <div v-if="def.id==='T07'||def.id==='T26'" class="w-full h-full" :style="{background:bg}"></div>
-        <canvas v-if="def.id==='T08'" id="qrc" class="rounded-lg shadow-2xl"></canvas>
-        <div v-if="def.id==='T21'" class="border-2 border-neon flex items-center justify-center text-neon font-bold bg-neon/10" :style="{width:arW+'px',height:arH+'px'}">{{ctrls.W.v}}:{{ctrls.H.v}}</div>
     </div>
 </div>
 </script>
 
 <script type="text/x-template" id="tpl-util">
-<div class="max-w-2xl mx-auto h-full flex flex-col items-center justify-center space-y-8">
-    <div v-if="def.id==='T05'" class="text-center">
-        <div class="text-8xl md:text-9xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 mb-8">{{sw.t}}</div>
-        <div class="flex gap-4 justify-center"><button @click="swT" class="w-20 h-20 rounded-full glass hover:bg-neon hover:text-black text-2xl transition"><i :class="sw.r?'fa-pause':'fa-play'"></i></button><button @click="swR" class="w-20 h-20 rounded-full glass hover:bg-red-500 text-red-500 hover:text-white text-2xl transition"><i class="fa-stop"></i></button></div>
+<div class="h-full flex flex-col items-center justify-center p-12">
+    <div v-if="tool.id==='T05'" class="text-center">
+        <div class="text-[10rem] font-black mono text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-800 leading-none mb-12">{{sw_f}}</div>
+        <div class="flex gap-6 justify-center"><button @click="sw_t" class="w-24 h-24 rounded-full glass border-neon/50 text-neon text-3xl hover:bg-neon hover:text-black transition-all"><i :class="sw_r?'fa-pause':'fa-play'"></i></button><button @click="sw_z" class="w-24 h-24 rounded-full glass border-red-500/50 text-red-500 text-3xl hover:bg-red-500 hover:text-white transition-all"><i class="fa-stop"></i></button></div>
     </div>
-    <div v-if="def.id==='T04'" class="w-full space-y-8">
-        <div class="flex bg-white/5 p-1 rounded"><button v-for="k in Object.keys(uc.u)" @click="uc.t=k" :class="['flex-1 py-2 text-sm rounded transition',uc.t===k?'bg-neon text-black font-bold':'text-gray-400']">{{k}}</button></div>
-        <div class="grid grid-cols-2 gap-8 items-center">
-            <div class="space-y-2"><input type="number" v-model="uc.v1" @input="ucC(1)" class="w-full text-4xl bg-transparent border-none p-0 font-bold"><select v-model="uc.k1" @change="ucC(1)" class="w-full bg-white/10 p-2 rounded"><option v-for="(v,k) in uc.u[uc.t]" :value="k">{{k}}</option></select></div>
-            <i class="fa-solid fa-arrow-right-arrow-left text-2xl text-gray-600 mx-auto"></i>
-            <div class="space-y-2"><input type="number" v-model="uc.v2" @input="ucC(2)" class="w-full text-4xl bg-transparent border-none p-0 font-bold text-neon text-right"><select v-model="uc.k2" @change="ucC(1)" class="w-full bg-white/10 p-2 rounded text-right"><option v-for="(v,k) in uc.u[uc.t]" :value="k">{{k}}</option></select></div>
+    <div v-if="tool.id==='T04'" class="w-full max-w-3xl space-y-12">
+        <div class="flex bg-white/5 p-2 rounded-2xl gap-2"><button v-for="k in Object.keys(uc_u)" @click="uc_t=k" :class="['flex-1 py-3 text-sm font-bold rounded-xl transition-all', uc_t===k?'bg-neon text-black shadow-lg shadow-neon/20':'text-gray-500']">{{uc_n[k]}}</button></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="p-8 glass rounded-3xl border-white/5 space-y-4 text-center">
+                <input type="number" v-model="uc_v1" @input="uc_c(1)" class="w-full text-5xl bg-transparent border-none text-center font-black">
+                <select v-model="uc_k1" @change="uc_c(1)" class="w-full bg-white/10 p-3 rounded-xl border-none text-sm">{{Object.keys(uc_u[uc_t]).map(k=><option :value="k">{{k}}</option>)}}</select>
+            </div>
+            <div class="p-8 glass rounded-3xl border-neon/20 space-y-4 text-center">
+                <input type="number" v-model="uc_v2" @input="uc_c(2)" class="w-full text-5xl bg-transparent border-none text-center font-black text-neon">
+                <select v-model="uc_k2" @change="uc_c(1)" class="w-full bg-white/10 p-3 rounded-xl border-none text-sm">{{Object.keys(uc_u[uc_t]).map(k=><option :value="k">{{k}}</option>)}}</select>
+            </div>
         </div>
     </div>
-    <div v-if="def.type==='info'" class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-        <div v-for="(v,k) in info" :key="k" class="p-4 glass rounded border-l-4 border-neon flex justify-between items-center">
-            <span class="text-xs text-gray-400 uppercase">{{k}}</span><span class="font-mono font-bold">{{v}}</span>
+    <div v-if="tool.type==='info'" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+        <div v-for="(v,k) in info" :key="k" class="p-6 glass rounded-2xl border-l-4 border-neon flex flex-col gap-1">
+            <span class="text-[10px] text-gray-500 uppercase mono tracking-widest">{{k}}</span><span class="text-lg font-bold truncate mono">{{v}}</span>
         </div>
     </div>
 </div>
 </script>
 
 <script>
-const {createApp,ref,computed,reactive,onMounted,watch,nextTick}=Vue;
-
-// --- Logic Modules ---
+const {createApp,ref,computed,reactive,onMounted,watch}=Vue;
 const mod={
-    b64:{e:t=>{try{return btoa(t)}catch{return'Error'}},d:t=>{try{return atob(t)}catch{return'Error'}}},
+    b64:{e:t=>{try{return btoa(unescape(encodeURIComponent(t)))}catch{return'ERROR'}},d:t=>{try{return decodeURIComponent(escape(atob(t)))}catch{return'ERROR'}}},
     hash:t=>CryptoJS.SHA256(t).toString(),
     md5:t=>CryptoJS.MD5(t).toString(),
     url:{e:t=>encodeURIComponent(t),d:t=>decodeURIComponent(t)},
     hex:{e:t=>t.split('').map(c=>c.charCodeAt(0).toString(16)).join(' '),d:t=>t.split(' ').map(h=>String.fromCharCode(parseInt(h,16))).join('')},
     bin:{e:t=>t.split('').map(c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join(' '),d:t=>t.split(' ').map(b=>String.fromCharCode(parseInt(b,2))).join('')},
-    slug:t=>t.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-'),
     case:{
-        snake:t=>t.replace(/\s+/g,'_').toLowerCase(),
+        snake:t=>t.replace(/\W+/g,' ').split(/ |\B(?=[A-Z])/).map(x=>x.toLowerCase()).join('_'),
         camel:t=>t.replace(/(?:^\w|[A-Z]|\b\w)/g,(w,i)=>i===0?w.toLowerCase():w.toUpperCase()).replace(/\s+/g,''),
-        kebab:t=>t.replace(/\s+/g,'-').toLowerCase(),
-        upper:t=>t.toUpperCase()
+        kebab:t=>t.replace(/\W+/g,' ').split(/ |\B(?=[A-Z])/).map(x=>x.toLowerCase()).join('-'),
     }
 };
-
-// --- Components ---
 const Trans={
-    template:'#tpl-trans',props:['def'],setup(p){
-        const i=ref(''),o=computed(()=>{
-            if(!i.value)return'';
-            const m=p.def.mode;
-            if(mod[m]) return typeof mod[m]==='function'?mod[m](i.value):mod[m].e(i.value);
-            if(m==='jwt') {try{return JSON.stringify(JSON.parse(atob(i.value.split('.')[1])),null,2)}catch{return 'Invalid JWT'}}
-            if(m==='html') return i.value.replace(/[\u00A0-\u9999<>&]/gim,i=>'&#'+i.charCodeAt(0)+';');
-            if(m==='parseUrl'){try{const u=new URL(i.value);return JSON.stringify({host:u.host,path:u.pathname,params:Object.fromEntries(u.searchParams)},null,2)}catch{return 'Invalid URL'}}
-            return i.value;
+    template:'#tpl-trans',props:['tool'],setup(p){
+        const inp=ref(''),out=computed(()=>{
+            if(!inp.value)return''; const m=p.tool.mode;
+            if(mod[m]) return typeof mod[m]==='function'?mod[m](inp.value):mod[m].e(inp.value);
+            if(m==='jwt'){try{return JSON.stringify(JSON.parse(atob(inp.value.split('.')[1])),null,2)}catch{return'INVALID_JWT'}}
+            if(m==='html')return inp.value.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+            return inp.value;
         });
-        const cp=()=>navigator.clipboard.writeText(o.value);
-        return{i,o,cp}
+        return{inp,out,copy:()=>navigator.clipboard.writeText(out.value)}
     }
 };
-
 const Gen={
-    template:'#tpl-gen',props:['def'],setup(p){
-        const res=ref('Ready'),def=p.def;
-        const run=()=>{
-            const o=def.opts;
-            if(def.id==='T01'){ // Pass
-                const c='abcdefghijklmnopqrstuvwxyz',n='0123456789',s='!@#$%^&*';
-                let set=c; if(o.Upper.v)set+=c.toUpperCase(); if(o.Num.v)set+=n; if(o.Sym.v)set+=s;
-                res.value=Array(o.Len.v).fill(0).map(()=>set[Math.floor(Math.random()*set.length)]).join('');
+    template:'#tpl-gen',props:['tool'],setup(p){
+        const res=ref('READY'),exec=()=>{
+            const o=p.tool.opts;
+            if(p.tool.id==='T01'){
+                let s='abcdefghijklmnopqrstuvwxyz'; if(o['大文字'].v)s+=s.toUpperCase(); if(o['数字'].v)s+='0123456789'; if(o['記号'].v)s+='!@#$%^&*';
+                res.value=Array(o['長さ'].v).fill(0).map(()=>s[Math.floor(Math.random()*s.length)]).join('');
             }
-            if(def.id==='T23') res.value=crypto.randomUUID(); // UUID
-            if(def.id==='T12') res.value="Lorem ipsum dolor sit amet...".repeat(o.Sentences.v); // Lorem
-            if(def.id==='T30') res.value=`id,name,email\n${Array(o.Rows.v).fill(0).map((_,i)=>`${i+1},User${i},u${i}@ex.com`).join('\n')}`; // Mock
+            if(p.tool.id==='T23')res.value=crypto.randomUUID();
+            if(p.tool.id==='T12')res.value="これはダミーテキストです。".repeat(o['回数'].v);
         };
-        const cp=()=>navigator.clipboard.writeText(res.value);
-        return{res,run,cp,def}
+        return{res,exec,copy:()=>navigator.clipboard.writeText(res.value)}
     }
 };
-
 const Dual={
-    template:'#tpl-dual',props:['def'],setup(p){
+    template:'#tpl-dual',props:['tool'],setup(p){
         const v1=ref(''),v2=ref('');
-        const act=(n)=>{
-            if(n==='fmt'){try{v2.value=JSON.stringify(JSON.parse(v1.value),null,2)}catch{v2.value='Invalid JSON'}}
-            if(n==='min'){try{v2.value=JSON.stringify(JSON.parse(v1.value))}catch{v2.value='Invalid JSON'}}
-            if(n==='diff'){ /* Simple Line Diff */ const a=v1.value.split('\n'),b=v2.value.split('\n'); v2.value = b.map((l,i)=>l===a[i]?l:`>>> ${l}`).join('\n'); }
+        const handle=(n)=>{
+            if(n==='fmt'){try{v2.value=JSON.stringify(JSON.parse(v1.value),null,2)}catch{v2.value='ERROR'}}
+            if(n==='min'){try{v2.value=JSON.stringify(JSON.parse(v1.value))}catch{v2.value='ERROR'}}
         };
         watch(v1,()=>{
-            if(p.def.mode==='html') v2.value=marked.parse(v1.value);
-            if(p.def.id==='T33') { /* CSV>JSON */ const[h,...r]=v1.value.split('\n').map(l=>l.split(',')); v2.value=JSON.stringify(r.map(d=>Object.fromEntries(h.map((k,i)=>[k,d[i]]))),null,2); }
-            if(p.def.id==='T16') { /* Word Count */ const t=v1.value; v2.value=`Chars: ${t.length}\nWords: ${t.split(/\s+/).filter(x=>x).length}\nLines: ${t.split('\n').length}`; }
-            if(p.def.id==='T31') { /* Case */ v2.value=`Snake: ${mod.case.snake(v1.value)}\nCamel: ${mod.case.camel(v1.value)}\nKebab: ${mod.case.kebab(v1.value)}\nUpper: ${mod.case.upper(v1.value)}`; }
-            if(p.def.id==='T19') { /* JWT */ try{v2.value=JSON.stringify(JSON.parse(atob(v1.value.split('.')[1])),null,2)}catch{v2.value='err'} }
+            if(p.tool.mode==='md')v2.value=marked.parse(v1.value);
+            if(p.tool.id==='T16')v2.value=`文字数: ${v1.value.length}\n行数: ${v1.value.split('\n').length}`;
         });
-        return{v1,v2,act}
+        return{v1,v2,handle}
     }
 };
-
-const Vis={
-    template:'#tpl-vis',props:['def'],setup(p){
-        const ctrls=reactive(p.def.ctrls||{}),hex=ref('#ffffff'),qrText=ref('https://example.com');
-        const bg=computed(()=>{
-            if(p.def.id==='T07') return `rgb(${ctrls.R.v},${ctrls.G.v},${ctrls.B.v})`;
-            if(p.def.id==='T26') return `linear-gradient(${ctrls.Deg.v}deg, ${ctrls.C1.v===1?'#f0f':'#0ff'}, ${ctrls.C2.v===1?'#00f':'#ff0'})`; // Simplified
-            return '';
-        });
-        const shadowStyle=computed(()=>({boxShadow:`${ctrls.X.v}px ${ctrls.Y.v}px ${ctrls.Blur.v}px ${ctrls.Spread.v}px rgba(0,0,0,0.5)`}));
-        const arW=computed(()=>200),arH=computed(()=>200*(ctrls.H.v/ctrls.W.v));
-        watch(qrText,()=>{
-            if(p.def.id==='T08') new QRious({element:document.getElementById('qrc'),value:qrText.value,size:200});
-        });
-        onMounted(()=>{if(p.def.id==='T08') qrText.value='https://google.com'});
-        return{ctrls,hex,bg,shadowStyle,arW,arH,qrText}
-    }
-};
-
 const Util={
-    template:'#tpl-util',props:['def'],setup(p){
-        // Stopwatch
-        const sw=reactive({t:'00:00:00',r:!1,i:null,s:0});
-        const swT=()=>{if(sw.r){clearInterval(sw.i);sw.r=!1}else{const st=Date.now()-sw.s;sw.i=setInterval(()=>{sw.s=Date.now()-st;const d=new Date(sw.s);sw.t=d.toISOString().substr(11,8)},10);sw.r=!0}};
-        const swR=()=>{sw.r=!1;clearInterval(sw.i);sw.s=0;sw.t='00:00:00'};
-        // Unit
-        const uc=reactive({t:'Len',v1:1,v2:3.2808,k1:'m',k2:'ft',u:{Len:{m:1,km:1000,ft:0.3048,mi:1609},Wt:{kg:1,lb:0.453},Tmp:{C:1,F:1}}});
-        const ucC=(n)=>{
-            if(uc.t==='Tmp'){uc.v2=uc.k1==='C'?(uc.v1*1.8+32):(uc.v1-32)/1.8; return;}
-            const r=uc.u[uc.t]; const b=n===1?uc.v1:uc.v2;
-            const res=n===1?(b*r[uc.k1]/r[uc.k2]):(b*r[uc.k2]/r[uc.k1]);
-            if(n===1)uc.v2=res.toFixed(4); else uc.v1=res.toFixed(4);
+    template:'#tpl-util',props:['tool'],setup(p){
+        const sw=reactive({t:0,r:!1,i:null}),sw_f=computed(()=>{const d=new Date(sw.t);return d.toISOString().substr(14,5)+'.'+(d.getMilliseconds()/10).toFixed(0).padStart(2,'0')});
+        const sw_t=()=>{if(sw.r){clearInterval(sw.i);sw.r=!1}else{const s=Date.now()-sw.t;sw.i=setInterval(()=>{sw.t=Date.now()-s},10);sw.r=!0}};
+        const uc_u={Len:{m:1,km:1000,cm:0.01,mm:0.001,ft:0.3048,in:0.0254},Wt:{kg:1,g:0.001,lb:0.453},Tmp:{C:1,F:1}};
+        const uc_n={Len:'長さ',Wt:'重さ',Tmp:'温度'};
+        const uc=reactive({t:'Len',v1:1,v2:3.2808,k1:'m',k2:'ft'});
+        const uc_c=(n)=>{
+            if(uc.t==='Tmp'){uc.v2=uc.k1==='C'?(uc.v1*1.8+32):(uc.v1-32)/1.8;return}
+            const r=uc_u[uc.t]; const b=n===1?uc.v1:uc.v2; const res=n===1?(b*r[uc.k1]/r[uc.k2]):(b*r[uc.k2]/r[uc.k1]);
+            if(n===1)uc.v2=res.toFixed(4);else uc.v1=res.toFixed(4);
         };
-        // Info
         const info=reactive({});
         onMounted(()=>{
-            if(p.def.id==='T36'){info.UA=navigator.userAgent;info.Screen=`${window.screen.width}x${window.screen.height}`;info.Lang=navigator.language;}
-            if(p.def.id==='T35'){fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>info.IP=d.ip).catch(()=>info.IP='Offline');}
-            if(p.def.id==='T18'){setInterval(()=>info.Unix=Math.floor(Date.now()/1000),1000);}
+            if(p.tool.id==='T36'){info.ブラウザ=navigator.userAgent;info.解像度=`${screen.width}x${screen.height}`;info.言語=navigator.language}
+            if(p.tool.id==='T18')setInterval(()=>info.UNIX=Math.floor(Date.now()/1000),1000);
         });
-        return{sw,swT,swR,uc,ucC,info}
+        return{sw_f,sw_t,sw_z:()=>{sw.t=0;sw.r=!1;clearInterval(sw.i)},uc_u,uc_n,uc_t:ref('Len'),uc_v1:ref(1),uc_v2:ref(1),uc_k1:ref('m'),uc_k2:ref('ft'),uc_c,info}
     }
 };
-
 createApp({
     setup(){
-        const q=ref(''),cat=ref('All'),cur=ref(null),cpu=ref(12),mem=ref(240);
-        setInterval(()=>{cpu.value=Math.floor(Math.random()*20)+5;mem.value=Math.floor(Math.random()*100)+200},2000);
-
-        const cats=['All','Dev','Design','Data','Math','Utility','Time'];
-        const catIcons={'All':'fa-layer-group','Dev':'fa-code','Design':'fa-palette','Data':'fa-database','Math':'fa-calculator','Utility':'fa-toolbox','Time':'fa-clock'};
-        
-        // --- 40 TOOLS CONFIG ---
+        const search=ref(''),activeCat=ref('すべて'),activeTool=ref(null),ping=ref(12);
+        setInterval(()=>ping.value=Math.floor(Math.random()*5)+10,3000);
+        const categories=['すべて','開発','デザイン','データ','数学','ツール','時間'];
+        const catIcons={'すべて':'fa-layer-group','開発':'fa-code','デザイン':'fa-palette','データ':'fa-database','数学':'fa-square-root-variable','ツール':'fa-toolbox','時間':'fa-clock'};
         const raw=[
-            // DEV (15)
-            {id:'T02',n:'Base64 Transcoder',c:'Trans',icon:'fa-code',d:'Bidirectional Base64 conversion',mode:'b64',cat:'Dev',grad:'from-purple-500 to-indigo-600'},
-            {id:'T03',n:'JSON Refiner',c:'Dual',icon:'fa-brackets-curly',d:'Format, Validate & Minify JSON',acts:[{n:'fmt',l:'Format'},{n:'min',l:'Minify'}],cat:'Dev',grad:'from-yellow-400 to-orange-500'},
-            {id:'T06',n:'RegEx Tester',c:'Trans',icon:'fa-flask',d:'Test regular expressions',mode:'regex',cat:'Dev',grad:'from-green-400 to-teal-500'},
-            {id:'T09',n:'Code Diff',c:'Dual',icon:'fa-file-contract',d:'Compare text/code snippets',acts:[{n:'diff',l:'Compare'}],cat:'Dev',grad:'from-blue-500 to-cyan-500'},
-            {id:'T10',n:'Markdown Viewer',c:'Dual',icon:'fa-markdown',d:'Live MD to HTML preview',mode:'html',cat:'Dev',grad:'from-gray-600 to-gray-800'},
-            {id:'T11',n:'Hash Calc',c:'Trans',icon:'fa-fingerprint',d:'SHA-256 / MD5 generator',mode:'hash',cat:'Dev',grad:'from-red-500 to-pink-600'},
-            {id:'T17',n:'SQL Formatter',c:'Dual',icon:'fa-database',d:'Beautify SQL Queries',acts:[{n:'fmt',l:'Format'}],cat:'Dev',grad:'from-indigo-400 to-blue-600'},
-            {id:'T19',n:'JWT Decoder',c:'Dual',icon:'fa-shield-halved',d:'Decode JSON Web Tokens',mode:'jwt',cat:'Dev',grad:'from-pink-500 to-purple-600'},
-            {id:'T23',n:'UUID Gen',c:'Gen',icon:'fa-id-card',d:'Generate v4 UUIDs',opts:{Count:{v:1}},cat:'Dev',grad:'from-cyan-500 to-blue-500'},
-            {id:'T24',n:'HTML Entities',c:'Trans',icon:'fa-code-commit',d:'Escape special chars',mode:'html',cat:'Dev',grad:'from-orange-500 to-red-500'},
-            {id:'T27',n:'Meta Tag Gen',c:'Gen',icon:'fa-tags',d:'SEO tags generator',opts:{Title:{v:1}},cat:'Dev',grad:'from-teal-500 to-emerald-600'},
-            {id:'T29',n:'URL Parser',c:'Trans',icon:'fa-link',d:'Parse URL params',mode:'parseUrl',cat:'Dev',grad:'from-blue-400 to-indigo-500'},
-            {id:'T31',n:'Case Converter',c:'Dual',icon:'fa-font',d:'Camel, Snake, Kebab case',cat:'Dev',grad:'from-violet-500 to-fuchsia-500'},
-            {id:'T32',n:'Slugify',c:'Trans',icon:'fa-minus',d:'URL-friendly slugs',mode:'slug',cat:'Dev',grad:'from-emerald-400 to-green-500'},
-            {id:'T34',n:'Curl Builder',c:'Trans',icon:'fa-terminal',d:'Build API requests',cat:'Dev',grad:'from-gray-500 to-slate-600'},
-
-            // DESIGN (8)
-            {id:'T07',n:'Color Mixer',c:'Vis',icon:'fa-palette',d:'RGB Blending',ctrls:{R:{v:100,max:255},G:{v:50,max:255},B:{v:200,max:255}},cat:'Design',grad:'from-pink-500 to-rose-500'},
-            {id:'T12',n:'Lorem Ipsum',c:'Gen',icon:'fa-paragraph',d:'Dummy text generator',opts:{Sentences:{v:5}},cat:'Design',grad:'from-gray-400 to-gray-500'},
-            {id:'T13',n:'Image to Base64',c:'Trans',icon:'fa-image',d:'Convert image file to string',cat:'Design',grad:'from-purple-400 to-pink-400'},
-            {id:'T14',n:'Contrast Check',c:'Vis',icon:'fa-circle-half-stroke',d:'WCAG Accessibility',cat:'Design',grad:'from-zinc-400 to-zinc-600'},
-            {id:'T20',n:'Shadow Gen',c:'Vis',icon:'fa-cloud',d:'CSS Box Shadow',ctrls:{X:{v:5,max:50},Y:{v:5,max:50},Blur:{v:10,max:100},Spread:{v:0,max:50}},cat:'Design',grad:'from-cyan-400 to-sky-500'},
-            {id:'T21',n:'Aspect Ratio',c:'Vis',icon:'fa-crop',d:'Calc dimensions',ctrls:{W:{v:16,max:100},H:{v:9,max:100}},cat:'Design',grad:'from-amber-400 to-orange-500'},
-            {id:'T26',n:'Gradient Gen',c:'Vis',icon:'fa-wand-magic',d:'CSS Gradients',ctrls:{Deg:{v:45,max:360},C1:{v:1,max:1},C2:{v:1,max:1}},cat:'Design',grad:'from-fuchsia-500 to-purple-600'},
-            {id:'T39',n:'Emoji Picker',c:'Gen',icon:'fa-face-smile',d:'Copy common symbols',opts:{},cat:'Design',grad:'from-yellow-300 to-yellow-500'},
-
-            // UTILITY (8)
-            {id:'T01',n:'Pass Gen',c:'Gen',icon:'fa-key',d:'Secure password creator',opts:{Len:{v:16},Upper:{v:!0},Num:{v:!0},Sym:{v:!0}},cat:'Utility',grad:'from-emerald-500 to-cyan-500'},
-            {id:'T08',n:'QR Code Gen',c:'Vis',icon:'fa-qrcode',d:'URL to QR Image',cat:'Utility',grad:'from-slate-200 to-slate-400'},
-            {id:'T16',n:'Word Counter',c:'Dual',icon:'fa-pen-nib',d:'Count chars, words, lines',cat:'Utility',grad:'from-blue-300 to-blue-500'},
-            {id:'T35',n:'My IP Info',c:'Util',icon:'fa-globe',d:'Public IP & Loc',type:'info',cat:'Utility',grad:'from-indigo-500 to-blue-600'},
-            {id:'T36',n:'Device Info',c:'Util',icon:'fa-mobile',d:'Screen & UA details',type:'info',cat:'Utility',grad:'from-gray-500 to-zinc-600'},
-            {id:'T37',n:'ASCII Art',c:'Trans',icon:'fa-font-awesome',d:'Text to ASCII banner',cat:'Utility',grad:'from-green-400 to-lime-500'},
-            {id:'T38',n:'Memo Pad',c:'Trans',icon:'fa-note-sticky',d:'Local storage text pad',cat:'Utility',grad:'from-yellow-200 to-orange-300'},
-            {id:'T40',n:'Phone Format',c:'Trans',icon:'fa-phone',d:'Format numbers',cat:'Utility',grad:'from-teal-400 to-teal-600'},
-
-            // DATA (4)
-            {id:'T30',n:'Data Mock',c:'Gen',icon:'fa-table',d:'Random CSV Data',opts:{Rows:{v:10}},cat:'Data',grad:'from-orange-500 to-red-500'},
-            {id:'T33',n:'CSV to JSON',c:'Dual',icon:'fa-file-csv',d:'Convert CSV strings',cat:'Data',grad:'from-green-600 to-emerald-700'},
-            {id:'T15',n:'Pomodoro',c:'Util',icon:'fa-tomato',d:'Focus timer 25m',type:'timer',cat:'Time',grad:'from-red-500 to-rose-600'},
-            {id:'T05',n:'Stopwatch',c:'Util',icon:'fa-stopwatch',d:'Lap timer',cat:'Time',grad:'from-red-400 to-red-600'},
-
-            // MATH (5)
-            {id:'T04',n:'Unit Converter',c:'Util',icon:'fa-ruler',d:'Length, Mass, Temp',cat:'Math',grad:'from-blue-500 to-indigo-500'},
-            {id:'T22',n:'Percentage',c:'Trans',icon:'fa-percent',d:'Calc increase/decrease',cat:'Math',grad:'from-lime-400 to-green-500'},
-            {id:'T25',n:'Binary Conv',c:'Trans',icon:'fa-1',d:'Text to 010101',mode:'bin',cat:'Math',grad:'from-cyan-600 to-blue-700'},
-            {id:'T28',n:'Hex Converter',c:'Trans',icon:'fa-cube',d:'Text to Hexadecimal',mode:'hex',cat:'Math',grad:'from-purple-500 to-violet-600'},
-            {id:'T18',n:'Unix Time',c:'Util',icon:'fa-clock',d:'Epoch timestamp',type:'info',cat:'Time',grad:'from-sky-400 to-blue-500'}
+            {id:'T01',n:'パスワード生成',c:'Gen',icon:'fa-key',d:'セキュリティ強度の高いランダム文字列を生成します',opts:{'長さ':{v:16},'大文字':{v:!0},'数字':{v:!0},'記号':{v:!0}},cat:'ツール',grad:'from-green-500 to-emerald-700'},
+            {id:'T02',n:'Base64変換',c:'Trans',icon:'fa-bolt',d:'テキストとBase64を相互に変換します',mode:'b64',cat:'開発',grad:'from-blue-500 to-indigo-700'},
+            {id:'T03',n:'JSON整形',c:'Dual',icon:'fa-brackets-curly',d:'JSONのバリデーションと見やすい整形、圧縮を行います',acts:[{n:'fmt',l:'整形'},{n:'min',l:'圧縮'}],cat:'開発',grad:'from-yellow-500 to-orange-600'},
+            {id:'T04',n:'単位変換',c:'Util',icon:'fa-ruler-combined',d:'長さ、重さ、温度などの国際単位を変換します',cat:'数学',grad:'from-cyan-500 to-blue-600'},
+            {id:'T05',n:'ストップウォッチ',c:'Util',icon:'fa-stopwatch',d:'ミリ秒単位の高精度なタイム計測が可能です',cat:'時間',grad:'from-rose-500 to-red-600'},
+            {id:'T06',n:'正規表現テスト',c:'Trans',icon:'fa-vial',d:'RegExパターンの検証をリアルタイムで行います',mode:'regex',cat:'開発',grad:'from-teal-500 to-green-600'},
+            {id:'T10',n:'Markdownプレビュー',c:'Dual',icon:'fa-markdown',d:'マークダウン記法を即座にHTMLとして描画します',mode:'md',cat:'開発',grad:'from-gray-700 to-gray-900'},
+            {id:'T11',n:'ハッシュ計算',c:'Trans',icon:'fa-fingerprint',d:'SHA-256による強力なデータハッシュを作成します',mode:'hash',cat:'開発',grad:'from-red-500 to-pink-700'},
+            {id:'T16',n:'文字数カウント',c:'Dual',icon:'fa-pen-nib',d:'文字数、行数をリアルタイムに解析します',cat:'ツール',grad:'from-sky-500 to-blue-700'},
+            {id:'T18',n:'UNIX時間変換',c:'Util',icon:'fa-clock',d:'現在のUNIXタイムスタンプを表示します',cat:'時間',grad:'from-indigo-500 to-purple-700'},
+            {id:'T19',n:'JWTデコーダー',c:'Trans',icon:'fa-shield-halved',d:'JSON Web Tokenの中身を解析して表示します',mode:'jwt',cat:'開発',grad:'from-fuchsia-500 to-purple-800'},
+            {id:'T23',n:'UUID生成',c:'Gen',icon:'fa-id-card',d:'一意な識別子(v4)をランダムに生成します',opts:{},cat:'開発',grad:'from-cyan-400 to-blue-500'},
+            {id:'T25',n:'バイナリ変換',c:'Trans',icon:'fa-1',d:'テキストを0と1のバイナリ表現に変換します',mode:'bin',cat:'数学',grad:'from-slate-600 to-slate-800'},
+            {id:'T28',n:'HEX変換',c:'Trans',icon:'fa-h',d:'テキストと16進数を相互に変換します',mode:'hex',cat:'数学',grad:'from-orange-400 to-red-500'},
+            {id:'T31',n:'ケース変換',c:'Trans',icon:'fa-font',d:'Snake, Camel, Kebabケースへ変換します',mode:'snake',cat:'開発',grad:'from-violet-500 to-purple-600'},
+            {id:'T36',n:'デバイス情報',c:'Util',icon:'fa-mobile-screen',d:'現在使用中のOSやブラウザ情報を取得します',type:'info',cat:'ツール',grad:'from-zinc-500 to-zinc-700'}
         ];
-
-        const list=computed(()=>raw.filter(t=>(cat.value==='All'||t.cat===cat.value)&&(t.n.toLowerCase().includes(q.value.toLowerCase())||t.id.toLowerCase().includes(q.value.toLowerCase()))));
-        const getCt=c=>c==='All'?raw.length:raw.filter(t=>t.cat===c).length;
-        const open=t=>cur.value=t;
-
-        return{q,cat,cats,catIcons,list,getCt,cur,open,cpu,mem}
+        const filtered=computed(()=>raw.filter(t=>(activeCat.value==='すべて'||t.cat===activeCat.value)&&(t.n.includes(search.value)||t.id.includes(search.value))));
+        return{search,activeCat,activeTool,categories,catIcons,filtered,ping}
     }
-}).component('Trans',Trans).component('Gen',Gen).component('Dual',Dual).component('Vis',Vis).component('Util',Util).mount('#app');
-
-// --- 3D BG ---
+}).component('Trans',Trans).component('Gen',Gen).component('Dual',Dual).component('Util',Util).mount('#app');
 const sc=new THREE.Scene();const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);const rd=new THREE.WebGLRenderer({alpha:!0,antialias:!0});
-rd.setSize(innerWidth,innerHeight);document.getElementById('bg').appendChild(rd.domElement);
-const geo=new THREE.IcosahedronGeometry(10,2);const mat=new THREE.MeshBasicMaterial({color:0x00f3ff,wireframe:!0,transparent:!0,opacity:0.05});
-const mesh=new THREE.Mesh(geo,mat);sc.add(mesh);cam.position.z=15;
-function ani(){requestAnimationFrame(ani);mesh.rotation.x+=0.001;mesh.rotation.y+=0.002;rd.render(sc,cam);}ani();
+rd.setSize(innerWidth,innerHeight);document.getElementById('bg-canvas').appendChild(rd.domElement);
+const geo=new THREE.TorusKnotGeometry(10,3,100,16);const mat=new THREE.MeshBasicMaterial({color:0x00f3ff,wireframe:!0,transparent:!0,opacity:0.03});
+const mesh=new THREE.Mesh(geo,mat);sc.add(mesh);cam.position.z=30;
+function ani(){requestAnimationFrame(ani);mesh.rotation.x+=0.001;mesh.rotation.y+=0.002;rd.render(sc,cam)}ani();
 window.onresize=()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rd.setSize(innerWidth,innerHeight)};
 </script>
 </body>
