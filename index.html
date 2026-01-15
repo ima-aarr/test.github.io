@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>X-INTERFACE</title>
+    <title>THE VOID | MOBILE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -15,37 +15,39 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap');
-        body { font-family: 'Syncopate', sans-serif; cursor: none; background: #000; overflow: hidden; }
+        body { font-family: 'Syncopate', sans-serif; background: #000; overflow: hidden; touch-action: none; }
         canvas { touch-action: none; pointer-events: none; }
-        .glitch-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; opacity: 0.05; background: repeating-linear-gradient(0deg, #fff 0px, #fff 1px, transparent 1px, transparent 2px); }
-        .cursor-ring { width: 60px; height: 60px; border: 1px solid #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 200; transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1); mix-blend-mode: difference; display: flex; align-items: center; justify-content: center; }
-        .cursor-dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; }
-        .title-stroke { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; transition: all 0.5s; }
-        .title-stroke:hover { -webkit-text-stroke: 1px rgba(255,255,255,1); color: white; filter: drop-shadow(0 0 15px white); }
+        .text-reveal { background: linear-gradient(to right, #fff 20%, #666 40%, #666 60%, #fff 80%); background-size: 200% auto; color: #000; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 5s linear infinite; }
+        @keyframes shine { to { background-position: 200% center; } }
+        .vignette { position: fixed; inset: 0; background: radial-gradient(circle, transparent 40%, black 150%); pointer-events: none; z-index: 5; }
+        .btn-glow { box-shadow: 0 0 15px rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body class="text-white">
-    <div class="glitch-layer"></div>
-    <div id="cursor" class="cursor-ring"><div class="cursor-dot"></div></div>
+    <div class="vignette"></div>
     <canvas id="canvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
 
-    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center">
-        <div class="absolute top-10 left-10 text-[8px] tracking-[1em] opacity-30 leading-loose">
-            CORE_SYSTEM: ENABLED<br>BUFFER_STATUS: OPTIMAL<br>NODE_ID: 0x77FF
+    <main class="relative z-10 min-h-[100dvh] flex flex-col items-center justify-between py-12 px-6">
+        <div class="w-full flex justify-between text-[6px] tracking-[1em] opacity-40">
+            <span>CORE_ID: MOBILE_MODE</span>
+            <span>SYSTEM_READY</span>
         </div>
 
-        <div class="text-center">
-            <h1 class="title-stroke text-7xl md:text-[12rem] font-bold tracking-tighter leading-none mb-8 cursor-pointer">
+        <div class="text-center w-full">
+            <h1 class="text-reveal text-4xl md:text-8xl font-bold tracking-tighter mb-4 scale-y-110">
                 YOUR NAME
             </h1>
-            <div id="status" class="text-[10px] tracking-[2em] uppercase opacity-40 ml-[2em]">
-                Initializing Neural Link...
-            </div>
+            <p class="text-[8px] tracking-[1.5em] uppercase opacity-30">Neural Interface</p>
         </div>
 
-        <div class="absolute bottom-20 flex space-x-12">
-            <button id="mode-toggle" class="text-[9px] tracking-[0.5em] border-b border-white/20 pb-2 hover:border-white transition-all">SYSTEM_SHIFT</button>
-            <button id="gravity-pull" class="text-[9px] tracking-[0.5em] border-b border-white/20 pb-2 hover:border-white transition-all">GRAVITY_VOID</button>
+        <div class="w-full max-w-xs space-y-4">
+            <button id="trigger" class="btn-glow w-full py-4 text-[9px] tracking-[0.6em] bg-white/5 backdrop-blur-md active:scale-95 transition-all">
+                SHIFT_PERSPECTIVE
+            </button>
+            <div class="flex justify-between text-[6px] opacity-20 tracking-widest px-2">
+                <span>VER. 2026.01</span>
+                <span>STATUS: ACTIVE</span>
+            </div>
         </div>
     </main>
 
@@ -54,79 +56,48 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: false, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const geometry = new THREE.BufferGeometry();
-        const vertices = [];
-        for (let i = 0; i < 8000; i++) {
-            vertices.push((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
-        }
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const material = new THREE.PointsMaterial({ size: 0.08, color: 0xffffff, transparent: true, opacity: 0.5 });
+        const count = 6000;
+        const pos = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) { pos[i] = (Math.random() - 0.5) * 80; }
+        geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const material = new THREE.PointsMaterial({ size: 0.1, color: 0xffffff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
         const points = new THREE.Points(geometry, material);
         scene.add(points);
 
-        const morphGeo = new THREE.TorusGeometry(15, 3, 16, 100);
-        const morphMat = new THREE.MeshPhongMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 });
-        const morphMesh = new THREE.Mesh(morphGeo, morphMat);
-        scene.add(morphMesh);
+        camera.position.z = 30;
 
-        const light = new THREE.DirectionalLight(0xffffff, 2);
-        light.position.set(1, 1, 2);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x222222));
+        let targetX = 0, targetY = 0;
+        let zoom = 30;
 
-        camera.position.z = 40;
+        const handleInput = (x, y) => {
+            targetX = (x / window.innerWidth - 0.5) * 10;
+            targetY = (y / window.innerHeight - 0.5) * 10;
+        };
 
-        let mouseX = 0, mouseY = 0;
-        let t = 0;
-        let voidMode = false;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.02;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.02;
-            document.getElementById('cursor').style.transform = `translate(${e.clientX - 30}px, ${e.clientY - 30}px)`;
-        });
-
+        window.addEventListener('mousemove', (e) => handleInput(e.clientX, e.clientY));
         window.addEventListener('touchmove', (e) => {
-            mouseX = (e.touches[0].clientX - window.innerWidth / 2) * 0.02;
-            mouseY = (e.touches[0].clientY - window.innerHeight / 2) * 0.02;
-        });
+            handleInput(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
 
-        document.getElementById('mode-toggle').addEventListener('click', () => {
-            morphMesh.visible = !morphMesh.visible;
-            material.color.setHex(Math.random() * 0xffffff);
-        });
-
-        document.getElementById('gravity-pull').addEventListener('click', () => {
-            voidMode = !voidMode;
-            document.getElementById('status').innerText = voidMode ? "VOID_ACTIVE" : "STABLE_FIELD";
+        document.getElementById('trigger').addEventListener('click', () => {
+            zoom = zoom === 30 ? 10 : 30;
         });
 
         function animate() {
             requestAnimationFrame(animate);
-            t += 0.01;
+            points.rotation.y += 0.002;
+            points.rotation.x += 0.001;
             
-            points.rotation.y += 0.001;
-            points.rotation.x += 0.0005;
+            camera.position.x += (targetX - camera.position.x) * 0.05;
+            camera.position.y += (-targetY - camera.position.y) * 0.05;
+            camera.position.z += (zoom - camera.position.z) * 0.05;
             
-            if(voidMode) {
-                camera.position.z += (10 - camera.position.z) * 0.05;
-                points.scale.setScalar(Math.sin(t) * 2 + 3);
-            } else {
-                camera.position.z += (40 - camera.position.z) * 0.05;
-                points.scale.setScalar(1);
-            }
-
-            camera.position.x += (mouseX - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
-
-            morphMesh.rotation.x += 0.01;
-            morphMesh.rotation.z += 0.01;
-
+            camera.lookAt(0, 0, 0);
             renderer.render(scene, camera);
         }
         animate();
@@ -136,8 +107,6 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        setTimeout(() => { document.getElementById('status').innerText = "LINK_ESTABLISHED"; }, 2000);
     </script>
 </body>
 </html>
